@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard";
 function App() {
   return (
     <>
+    <h1>|| Shri Ganeshay Namah ! ||</h1>
       <h1>PowerPe</h1>
       <Dashboard />
     </>
