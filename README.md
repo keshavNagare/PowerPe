@@ -1,2 +1,0 @@
-# ⚡PowerPe : Electricity Bill Management System.
-#### PowerPe, an electricity bill management system with separate login roles for Admin and Customer, offering role-based access and dashboard functionality.
