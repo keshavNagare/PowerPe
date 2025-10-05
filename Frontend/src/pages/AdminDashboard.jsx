@@ -14,7 +14,12 @@ const GlassCard = ({ children, className = "" }) => (
 );
 
 // Action Button
-const ActionButton = ({ children, onClick, disabled = false, type = "button" }) => (
+const ActionButton = ({
+  children,
+  onClick,
+  disabled = false,
+  type = "button",
+}) => (
   <button
     onClick={onClick}
     type={type}
@@ -25,9 +30,14 @@ const ActionButton = ({ children, onClick, disabled = false, type = "button" }) 
   </button>
 );
 
-// Customer Dropdown
-const CustomerDropdown = ({ customers, selectedCustomer, setSelectedCustomer }) => {
+// Customer Dropdown with search
+const CustomerDropdown = ({
+  customers,
+  selectedCustomer,
+  setSelectedCustomer,
+}) => {
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const ref = useRef();
 
   useEffect(() => {
@@ -35,8 +45,15 @@ const CustomerDropdown = ({ customers, selectedCustomer, setSelectedCustomer }) 
       if (ref.current && !ref.current.contains(event.target)) setOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.email.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="relative w-full" ref={ref}>
@@ -48,7 +65,9 @@ const CustomerDropdown = ({ customers, selectedCustomer, setSelectedCustomer }) 
         {selectedCustomer ? (
           <div className="flex flex-col items-start leading-tight">
             <span className="font-medium">{selectedCustomer.name}</span>
-            <span className="text-sm text-gray-300">{selectedCustomer.email}</span>
+            <span className="text-sm text-gray-300">
+              {selectedCustomer.email}
+            </span>
           </div>
         ) : (
           "Select Customer"
@@ -57,17 +76,30 @@ const CustomerDropdown = ({ customers, selectedCustomer, setSelectedCustomer }) 
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 w-full max-h-[200px] overflow-y-auto mt-1 bg-[#4a4c4d] border border-white/20 rounded-lg shadow-lg z-[9999]">
-          {customers.length > 0 ? (
-            customers.map((c, idx) => (
+        <div className="absolute top-full left-0 w-full max-h-[250px] overflow-y-auto mt-1 bg-[#4a4c4d] border border-white/20 rounded-lg shadow-lg z-[9999] scrollwidth">
+          <div className="sticky top-0 bg-[#4a4c4d] p-2 border-b border-white/20">
+            <input
+              type="text"
+              placeholder="Search customer..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full px-3 py-2 rounded-md bg-white/10 text-gray-100 placeholder-gray-300 border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {filteredCustomers.length > 0 ? (
+            filteredCustomers.map((c, idx) => (
               <div
                 key={c._id}
                 className={`w-full cursor-pointer hover:bg-gray-200 hover:text-black transition-colors ${
-                  idx !== customers.length - 1 ? "border-b border-gray-400/50" : ""
+                  idx !== filteredCustomers.length - 1
+                    ? "border-b border-gray-400/50"
+                    : ""
                 }`}
                 onClick={() => {
                   setSelectedCustomer(c);
                   setOpen(false);
+                  setSearch("");
                 }}
               >
                 <div className="px-4 py-2 w-full">
@@ -92,23 +124,24 @@ const AdminDashboard = () => {
   const [unitsConsumed, setUnitsConsumed] = useState("");
   const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState("info");
-
-  // Search state
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Edit modal state
   const [editBill, setEditBill] = useState(null);
   const [editUnits, setEditUnits] = useState("");
   const [editAmount, setEditAmount] = useState("");
   const [editDueDate, setEditDueDate] = useState("");
   const [editStatus, setEditStatus] = useState("");
 
+  // New states for year/month filter
+  const [filterYear, setFilterYear] = useState("");
+  const [filterMonth, setFilterMonth] = useState("");
+
   // Fetch customers
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/customers", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "http://localhost:8000/api/admin/customers",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setCustomers(res.data);
     } catch (error) {
       console.error("Error fetching customers:", error);
@@ -132,7 +165,6 @@ const AdminDashboard = () => {
     fetchBills();
   }, [token]);
 
-  // Generate bill
   const handleGenerateBill = async (e) => {
     e.preventDefault();
     if (!selectedCustomer || !unitsConsumed) {
@@ -153,8 +185,7 @@ const AdminDashboard = () => {
     if (units <= 100) amount = units * (4.43 + wheelingCharge);
     else if (units <= 300)
       amount =
-        100 * (4.43 + wheelingCharge) +
-        (units - 100) * (9.64 + wheelingCharge);
+        100 * (4.43 + wheelingCharge) + (units - 100) * (9.64 + wheelingCharge);
     else if (units <= 500)
       amount =
         100 * (4.43 + wheelingCharge) +
@@ -182,11 +213,13 @@ const AdminDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      fetchBills(); // refetch
+      fetchBills();
       setSelectedCustomer(null);
       setUnitsConsumed("");
       setMessage(
-        `✅ Bill generated successfully! Amount: ₹${parseFloat(amount.toFixed(2))}`
+        `✅ Bill generated successfully! Amount: ₹${parseFloat(
+          amount.toFixed(2)
+        )}`
       );
       setMessageType("success");
       setTimeout(() => setMessage(null), 5000);
@@ -198,7 +231,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Delete bill
   const handleDeleteBill = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/admin/bills/${id}`, {
@@ -216,7 +248,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Edit modal
   const openEditModal = (bill) => {
     setEditBill(bill);
     setEditUnits(bill.units);
@@ -253,14 +284,46 @@ const AdminDashboard = () => {
     }
   };
 
-  // Filter + Sort bills
+  // Filter bills
   const filteredBills = bills
-    .filter((bill) =>
-      bill.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bill.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bill.status.toLowerCase().includes(searchTerm.toLowerCase())
+    .filter(
+      (bill) =>
+        bill.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bill.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bill.status.toLowerCase().includes(searchTerm.toLowerCase())
     )
-    .sort((a, b) => new Date(b.createdAt || b.issueDate) - new Date(a.createdAt || a.issueDate));
+    .filter((bill) => {
+      if (!filterYear && !filterMonth) return true;
+      const issue = new Date(bill.issueDate);
+      const yearMatch = filterYear ? issue.getFullYear() === parseInt(filterYear) : true;
+      const monthMatch = filterMonth ? issue.getMonth() + 1 === parseInt(filterMonth) : true;
+      return yearMatch && monthMatch;
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt || b.issueDate) -
+        new Date(a.createdAt || a.issueDate)
+    );
+
+  // Generate year options dynamically
+  const years = Array.from(
+    new Set(bills.map((b) => new Date(b.issueDate).getFullYear()))
+  ).sort((a, b) => b - a);
+
+  const months = [
+    { value: 1, name: "January" },
+    { value: 2, name: "February" },
+    { value: 3, name: "March" },
+    { value: 4, name: "April" },
+    { value: 5, name: "May" },
+    { value: 6, name: "June" },
+    { value: 7, name: "July" },
+    { value: 8, name: "August" },
+    { value: 9, name: "September" },
+    { value: 10, name: "October" },
+    { value: 11, name: "November" },
+    { value: 12, name: "December" },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col relative lg:flex-row bg-gradient-to-tr from-[#232526] to-[#414345] text-white p-4 sm:p-6 overflow-hidden">
@@ -336,81 +399,108 @@ const AdminDashboard = () => {
               </form>
             </GlassCard>
 
-            {/* All Bills */}
-           {/* All Bills */}
-<GlassCard className="p-6">
+            {/* All Bills Table with fixed header */}
+            <GlassCard className="p-6">
   <h2 className="text-xl font-semibold mb-2">All Bills</h2>
   <hr className="border-white/20 mb-4" />
 
-  {/* 🔎 Search Bar here */}
-  <input
-    type="text"
-    placeholder="Search by name, email or status..."
-    value={searchTerm}
-    onChange={(e) => setSearchTerm(e.target.value)}
-    className="w-full mb-4 bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-  />
+  {/* Search + Filters */}
+  <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+    <input
+      type="text"
+      placeholder="Search by name, email or status..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="w-full sm:w-1/2 bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+    />
+    <select
+      value={filterYear}
+      onChange={(e) => setFilterYear(e.target.value)}
+      className="w-full sm:w-1/4 bg-[#4a4c4d] shadow-[1px_2px_4px_rgb(32,32,32)] border border-white/20 rounded-lg px-4 py-2 text-gray-200"
+    >
+      <option value="">All Years</option>
+      {years.map((y) => (
+        <option key={y} value={y}>
+          {y}
+        </option>
+      ))}
+    </select>
+    <select
+      value={filterMonth}
+      onChange={(e) => setFilterMonth(e.target.value)}
+      className="w-full sm:w-1/4 bg-[#4a4c4d] shadow-[1px_2px_4px_rgb(32,32,32)] border border-white/20 rounded-lg px-4 py-2 text-gray-200"
+    >
+      <option value="">All Months</option>
+      {months.map((m) => (
+        <option key={m.value} value={m.value}>
+          {m.name}
+        </option>
+      ))}
+    </select>
+  </div>
 
-  <div className="max-h-[50vh] overflow-y-auto rounded-lg border border-solid border-gray-400 scrollwidth">
-    <table className="min-w-full text-sm text-left">
-      <thead className="text-gray-300 uppercase text-xs border-b border-white/20 sticky top-0 bg-[#2d2f31] z-10">
-        <tr>
-          <th className="p-3 sm:p-4">Customer</th>
-          <th className="p-3 sm:p-4">Email</th>
-          <th className="p-3 sm:p-4">Units</th>
-          <th className="p-3 sm:p-4">Amount</th>
-          <th className="p-3 sm:p-4">Issue Date</th>
-          <th className="p-3 sm:p-4">Due Date</th>
-          <th className="p-3 sm:p-4">Status</th>
-          <th className="p-3 sm:p-4">Actions</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-white/20">
-        {filteredBills.length > 0 ? (
-          filteredBills.map((bill) => (
-            <tr key={bill._id} className="hover:bg-white/10 transition-colors">
-              <td className="p-3 sm:p-4 text-white">{bill.user?.name}</td>
-              <td className="p-3 sm:p-4 text-gray-300">{bill.user?.email}</td>
-              <td className="p-3 sm:p-4 text-gray-200">{bill.units} kWh</td>
-              <td className="p-3 sm:p-4 text-gray-200">₹{bill.amount}</td>
-              <td className="p-3 sm:p-4 text-gray-400">
-                {bill.issueDate?.slice(0, 10)}
-              </td>
-              <td className="p-3 sm:p-4 text-gray-400">
-                {bill.dueDate?.slice(0, 10)}
-              </td>
-              <td className="p-3 sm:p-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    bill.status === "paid"
-                      ? "bg-green-500/20 text-green-400"
-                      : "bg-red-500/20 text-red-400"
-                  }`}
-                >
-                  {bill.status}
-                </span>
-              </td>
-              <td className="p-3 sm:p-4 flex gap-2">
-                <PencilIcon
-                  onClick={() => openEditModal(bill)}
-                  className="w-5 h-5 text-yellow-400 cursor-pointer hover:text-yellow-300"
-                />
-                <TrashIcon
-                  onClick={() => handleDeleteBill(bill._id)}
-                  className="w-5 h-5 text-red-400 cursor-pointer hover:text-red-300"
-                />
+  {/* Responsive table wrapper */}
+  <div className="overflow-x-auto w-full scrollwidth">
+    <div className="inline-block min-w-[800px] w-full scrollwidth" style={{ maxHeight: "50vh", overflowY: "auto" }}>
+      <table className="w-full text-sm text-left border-collapse">
+        {/* Table Head */}
+        <thead className="text-gray-300 uppercase text-xs border-b border-white/20 sticky top-0 bg-[#2d2f31] z-10">
+          <tr>
+            <th className="p-3 sm:p-4">Customer</th>
+            <th className="p-3 sm:p-4">Email</th>
+            <th className="p-3 sm:p-4">Units</th>
+            <th className="p-3 sm:p-4">Amount</th>
+            <th className="p-3 sm:p-4">Issue Date</th>
+            <th className="p-3 sm:p-4">Due Date</th>
+            <th className="p-3 sm:p-4">Status</th>
+            <th className="p-3 sm:p-4">Actions</th>
+          </tr>
+        </thead>
+
+        {/* Table Body */}
+        <tbody className="divide-y divide-white/20">
+          {filteredBills.length > 0 ? (
+            filteredBills.map((bill) => (
+              <tr key={bill._id} className="hover:bg-white/10 transition-colors">
+                <td className="p-3 sm:p-4 text-white">{bill.user?.name}</td>
+                <td className="p-3 sm:p-4 text-gray-300">{bill.user?.email}</td>
+                <td className="p-3 sm:p-4 text-gray-200">{bill.units} kWh</td>
+                <td className="p-3 sm:p-4 text-gray-200">₹{bill.amount}</td>
+                <td className="p-3 sm:p-4 text-gray-400">{bill.issueDate?.slice(0, 10)}</td>
+                <td className="p-3 sm:p-4 text-gray-400">{bill.dueDate?.slice(0, 10)}</td>
+                <td className="p-3 sm:p-4">
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      bill.status === "paid"
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
+                  >
+                    {bill.status}
+                  </span>
+                </td>
+                <td className="p-3 sm:p-4 flex gap-2">
+                  <PencilIcon
+                    onClick={() => openEditModal(bill)}
+                    className="w-5 h-5 text-yellow-400 cursor-pointer hover:text-yellow-300"
+                  />
+                  <TrashIcon
+                    onClick={() => handleDeleteBill(bill._id)}
+                    className="w-5 h-5 text-red-400 cursor-pointer hover:text-red-300"
+                  />
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="8" className="text-center text-gray-300 py-12">
+                No bills found.
               </td>
             </tr>
-          ))
-        ) : (
-          <tr>
-            <td colSpan="8" className="text-center text-gray-300 py-12">
-              No bills found.
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
+          )}
+        </tbody>
+      </table>
+    </div>
   </div>
 </GlassCard>
 

@@ -2,7 +2,7 @@ const Consumption = require('../models/Consumption');
 
 exports.getMyConsumption = async (req, res) => {
   try {
-    const data = await Consumption.find({ user: req.user._id }).sort({ month: 1 });
+    const data = await Consumption.find({ user: req.user._id }).sort({ year: 1, month: 1 });
     res.json(data);
   } catch (error) {
     console.error(error);

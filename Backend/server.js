@@ -5,6 +5,8 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes'); // Optional
 const adminRoutes = require('./routes/adminRoutes');
 const customerRoutes = require('./routes/userRoutes');
+const paymentRoutes = require("./routes/paymentRoutes");
+
 
 connectDB();
 
@@ -16,6 +18,8 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/customer', customerRoutes);
+app.use("/api/customer/payments", paymentRoutes);
+
 
 app.get('/', (req, res) => res.send('API running'));
 

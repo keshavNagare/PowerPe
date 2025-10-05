@@ -1,6 +1,9 @@
 const Bill = require('../models/Bill');
 const User = require('../models/User');
+const Consumption = require('../models/Consumption');
 const mongoose = require('mongoose');
+
+// Helper: Month names
 
 // Get all bills (admin only)
 const getAllBills = async (req, res) => {
@@ -18,16 +21,24 @@ const createBill = async (req, res) => {
   try {
     const { user, name, units, amount, dueDate } = req.body;
 
-    const newBill = new Bill({
-      user,
-      name,
-      units,
-      amount,
-      dueDate,
-    });
-
+    // Create new Bill
+    const newBill = new Bill({ user, name, units, amount, dueDate });
     const savedBill = await newBill.save();
     const populatedBill = await savedBill.populate('user', 'name email');
+
+    // Update Consumption data
+    const issueDate = new Date(savedBill.issueDate);
+    const month = issueDate.getMonth() + 1; // 1-12
+    const year = issueDate.getFullYear();
+
+    const existingConsumption = await Consumption.findOne({ user, month, year });
+
+    if (existingConsumption) {
+      existingConsumption.units += units;
+      await existingConsumption.save();
+    } else {
+      await Consumption.create({ user, month, year, units });
+    }
 
     res.status(201).json(populatedBill);
   } catch (error) {
@@ -40,15 +51,16 @@ const createBill = async (req, res) => {
 const updateBill = async (req, res) => {
   try {
     const billId = req.params.id;
-
-    if (!mongoose.Types.ObjectId.isValid(billId)) {
-      return res.status(400).json({ message: 'Invalid Bill ID' });
-    }
+    if (!mongoose.Types.ObjectId.isValid(billId)) return res.status(400).json({ message: 'Invalid Bill ID' });
 
     let bill = await Bill.findById(billId);
-    if (!bill) {
-      return res.status(404).json({ message: 'Bill not found' });
-    }
+    if (!bill) return res.status(404).json({ message: 'Bill not found' });
+
+    // Save old units & date
+    const oldUnits = bill.units;
+    const oldDate = new Date(bill.issueDate);
+    const oldMonth = oldDate.getMonth() + 1;
+    const oldYear = oldDate.getFullYear();
 
     // Update Bill fields
     bill.name = req.body.name ?? bill.name;
@@ -59,7 +71,31 @@ const updateBill = async (req, res) => {
 
     await bill.save();
 
-    // If admin edited user details
+    // Update Consumption if units/date changed
+    const newDate = new Date(bill.issueDate);
+    const newMonth = newDate.getMonth() + 1;
+    const newYear = newDate.getFullYear();
+
+    if (oldUnits !== bill.units || oldMonth !== newMonth || oldYear !== newYear) {
+      // Decrease old consumption
+      const oldConsumption = await Consumption.findOne({ user: bill.user, month: oldMonth, year: oldYear });
+      if (oldConsumption) {
+        oldConsumption.units -= oldUnits;
+        if (oldConsumption.units <= 0) await oldConsumption.remove();
+        else await oldConsumption.save();
+      }
+
+      // Increase new consumption
+      const newConsumption = await Consumption.findOne({ user: bill.user, month: newMonth, year: newYear });
+      if (newConsumption) {
+        newConsumption.units += bill.units;
+        await newConsumption.save();
+      } else {
+        await Consumption.create({ user: bill.user, month: newMonth, year: newYear, units: bill.units });
+      }
+    }
+
+    // Update user if admin edited
     if (req.body.user && (req.body.user.name || req.body.user.email)) {
       let user = await User.findById(bill.user);
       if (user) {
@@ -69,9 +105,9 @@ const updateBill = async (req, res) => {
       }
     }
 
-    // Return updated bill with populated user
     const updatedBill = await Bill.findById(bill._id).populate('user', 'name email');
     res.json(updatedBill);
+
   } catch (error) {
     console.error('Update Bill Error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -82,14 +118,21 @@ const updateBill = async (req, res) => {
 const deleteBill = async (req, res) => {
   try {
     const billId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(billId)) return res.status(400).json({ message: 'Invalid Bill ID' });
 
-    if (!mongoose.Types.ObjectId.isValid(billId)) {
-      return res.status(400).json({ message: 'Invalid Bill ID' });
-    }
+    const bill = await Bill.findByIdAndDelete(billId);
+    if (!bill) return res.status(404).json({ message: 'Bill not found' });
 
-    const deletedBill = await Bill.findByIdAndDelete(billId);
-    if (!deletedBill) {
-      return res.status(404).json({ message: 'Bill not found' });
+    // Adjust consumption
+    const billDate = new Date(bill.issueDate);
+    const month = billDate.getMonth() + 1;
+    const year = billDate.getFullYear();
+
+    const consumption = await Consumption.findOne({ user: bill.user, month, year });
+    if (consumption) {
+      consumption.units -= bill.units;
+      if (consumption.units <= 0) await consumption.remove();
+      else await consumption.save();
     }
 
     res.json({ message: 'Bill deleted successfully', id: billId });
@@ -110,10 +153,4 @@ const getMyBills = async (req, res) => {
   }
 };
 
-module.exports = {
-  getAllBills,
-  createBill,
-  updateBill,
-  deleteBill,
-  getMyBills,
-};
+module.exports = { getAllBills, createBill, updateBill, deleteBill, getMyBills };
