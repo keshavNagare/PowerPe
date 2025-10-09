@@ -205,6 +205,7 @@ const LandingPage = () => {
             <LightBulbIcon className="w-6 h-6 text-yellow-400" />
             <LightBulbIcon className="w-6 h-6 text-yellow-500" />
             <LightBulbIcon className="w-6 h-6 text-yellow-600" />
+            <LightBulbIcon className="w-6 h-6 text-yellow-800" />
           </div>
         </div>
       </section>

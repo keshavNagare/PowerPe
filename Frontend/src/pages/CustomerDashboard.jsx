@@ -170,8 +170,7 @@ const CustomerDashboard = () => {
       details = `0-100 Units: ₹4.43/unit + Wheeling ₹${wheelingCharge}`;
     } else if (units <= 300) {
       amount =
-        100 * (4.43 + wheelingCharge) +
-        (units - 100) * (9.64 + wheelingCharge);
+        100 * (4.43 + wheelingCharge) + (units - 100) * (9.64 + wheelingCharge);
       details = `0-100: ₹4.43 + ₹${wheelingCharge}, 101-${units}: ₹9.64 + ₹${wheelingCharge}`;
     } else if (units <= 500) {
       amount =
@@ -279,9 +278,7 @@ const CustomerDashboard = () => {
 
           {/* Consumption History */}
           <GlassCard className="p-6 lg:col-span-4">
-            <h3 className="text-lg font-semibold">
-              Consumption History (kWh)
-            </h3>
+            <h3 className="text-lg font-semibold">Consumption History (kWh)</h3>
             <hr className="border-white/20 mb-3" />
 
             {/* Filters */}
@@ -336,7 +333,23 @@ const CustomerDashboard = () => {
                     }}
                   />
                   <Legend />
-                  <Bar dataKey="units" fill="#82ca9d" barSize={40} />
+
+                  {/* Gradient definition */}
+                  <defs>
+                    <linearGradient id="barColor" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#FFD700" /> {/* Yellow */}
+                      <stop offset="100%" stopColor="#FF8C00" /> {/* Orange */}
+                    </linearGradient>
+                  </defs>
+
+                  {/* Bar with gradient */}
+                  <Bar
+                    dataKey="units"
+                    fill="url(#barColor)"
+                    name="Months"
+                    barSize={40}
+                    radius={[8, 8, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -410,7 +423,9 @@ const CustomerDashboard = () => {
                               {bill.dueDate?.slice(0, 10)}
                             </td>
                             <td className="p-3 text-gray-200">{bill.units}</td>
-                            <td className="p-3 text-gray-200">₹{bill.amount}</td>
+                            <td className="p-3 text-gray-200">
+                              ₹{bill.amount}
+                            </td>
                             <td className="p-3">
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
