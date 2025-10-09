@@ -415,7 +415,7 @@ const LandingPage = () => {
 
         /* Hover glow effect for cards */
         .hover-glow:hover {
-          box-shadow: 0 0 20px 4px #FFD700, 0 0 40px 8px #FF8C00;
+          box-shadow: 0 0 10px 2px #FFD700, 0 0 20px 4px #FF8C00;
           transform: translateY(-3px);
           transition: transform 0.3s, box-shadow 0.3s;
         }
