@@ -1,16 +1,17 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import LandingPage from "./pages/LandingPage"; // 👈 create this from your HTML
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
 
 function App() {
   const { token, user } = useContext(AuthContext);
 
-  // Auto redirect if user is already logged in
+  // Redirect logged-in users automatically
   const RedirectIfLoggedIn = ({ children }) => {
     if (token && user?.role === "admin") return <Navigate to="/admin/dashboard" replace />;
     if (token && user?.role === "customer") return <Navigate to="/customer/dashboard" replace />;
@@ -20,15 +21,17 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Login/Register */}
+        {/* Public Landing Page */}
         <Route
           path="/"
           element={
             <RedirectIfLoggedIn>
-              <LoginPage />
+              <LandingPage /> {/* 👈 Your PowerPe landing page */}
             </RedirectIfLoggedIn>
           }
         />
+
+        {/* Login & Register */}
         <Route
           path="/login"
           element={
@@ -46,7 +49,7 @@ function App() {
           }
         />
 
-        {/* Protected Routes */}
+        {/* Protected Dashboards */}
         <Route
           path="/admin/dashboard"
           element={
@@ -64,7 +67,7 @@ function App() {
           }
         />
 
-        {/* Catch-all: redirect unknown routes to login */}
+        {/* Fallback for unknown routes */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
