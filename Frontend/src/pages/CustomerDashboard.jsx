@@ -348,7 +348,7 @@ const CustomerDashboard = () => {
                     fill="url(#barColor)"
                     name="Months"
                     barSize={40}
-                    radius={[8, 8, 0, 0]}
+                    radius={[2, 2, 0, 0]}
                   />
                 </BarChart>
               </ResponsiveContainer>

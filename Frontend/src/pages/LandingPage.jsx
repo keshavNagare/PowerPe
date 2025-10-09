@@ -194,11 +194,13 @@ const LandingPage = () => {
             manage electricity bills for your customers with real-time
             monitoring.
           </p>
-          <button onClick={() => {
-                setNavOpen(false);
-                navigate("/login");
-              }}
-          className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-yellow-300 transition-transform hover:scale-105 animate-fadeIn delay-400">
+          <button
+            onClick={() => {
+              setNavOpen(false);
+              navigate("/login");
+            }}
+            className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-yellow-300 transition-transform hover:scale-105 animate-fadeIn delay-400"
+          >
             Get Started <ArrowRightIcon className="w-5 h-5" />
           </button>
           <div className="mt-12 flex justify-center gap-4 animate-bounce">
@@ -224,7 +226,7 @@ const LandingPage = () => {
           className="w-full max-w-3xl mb-12 rounded-xl shadow-lg"
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full">
-          <GlassCard className="p-8 text-center hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 text-center hover-glow transition-transform duration-300">
             <UserGroupIcon className="w-12 h-12 mx-auto mb-4 text-yellow-400 animate-bounce" />
             <h3 className="text-2xl font-semibold mb-2">Add Customers</h3>
             <p className="text-gray-200 mb-4">
@@ -236,7 +238,7 @@ const LandingPage = () => {
             </p>
             <p className="text-gray-300 text-sm">Customers Added</p>
           </GlassCard>
-          <GlassCard className="p-8 text-center hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 text-center hover-glow transition-transform duration-300">
             <BoltIcon className="w-12 h-12 mx-auto mb-4 text-yellow-400 animate-bounce" />
             <h3 className="text-2xl font-semibold mb-2">Generate Bills</h3>
             <p className="text-gray-200 mb-4">
@@ -248,7 +250,7 @@ const LandingPage = () => {
             </p>
             <p className="text-gray-300 text-sm">Bills Generated</p>
           </GlassCard>
-          <GlassCard className="p-8 text-center hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 text-center hover-glow transition-transform duration-300">
             <CurrencyDollarIcon className="w-12 h-12 mx-auto mb-4 text-yellow-400 animate-bounce" />
             <h3 className="text-2xl font-semibold mb-2">Monitor Payments</h3>
             <p className="text-gray-200 mb-4">
@@ -277,7 +279,7 @@ const LandingPage = () => {
           className="w-full max-w-3xl mb-12 rounded-xl shadow-lg"
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full">
-          <GlassCard className="p-8 hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <h3 className="text-2xl font-semibold mb-2 flex items-center gap-2">
               <BoltIcon className="w-6 h-6 text-yellow-400" /> Real-Time
               Dashboard
@@ -287,7 +289,7 @@ const LandingPage = () => {
               sleek interactive dashboard.
             </p>
           </GlassCard>
-          <GlassCard className="p-8 hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <h3 className="text-2xl font-semibold mb-2 flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 h-6 text-yellow-400" />{" "}
               Automated Billing
@@ -297,7 +299,7 @@ const LandingPage = () => {
               rates for complete accuracy.
             </p>
           </GlassCard>
-          <GlassCard className="p-8 hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <h3 className="text-2xl font-semibold mb-2 flex items-center gap-2">
               <MapPinIcon className="w-6 h-6 text-yellow-400" /> Secure &
               Reliable
@@ -324,17 +326,17 @@ const LandingPage = () => {
           className="w-full max-w-3xl mb-12 rounded-xl shadow-lg"
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 w-full text-center">
-          <GlassCard className="p-8 hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <PhoneIcon className="w-10 h-10 mx-auto mb-4 text-yellow-400" />
             <h3 className="text-2xl font-semibold mb-2">Customer Care</h3>
             <p className="text-gray-200">+91 1800-123-456</p>
           </GlassCard>
-          <GlassCard className="p-8 hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <EnvelopeIcon className="w-10 h-10 mx-auto mb-4 text-yellow-400" />
             <h3 className="text-2xl font-semibold mb-2">Email Support</h3>
             <p className="text-gray-200">support@powerpe.com</p>
           </GlassCard>
-          <GlassCard className="p-8 hover:scale-105 transition-transform duration-300">
+          <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <MapPinIcon className="w-10 h-10 mx-auto mb-4 text-yellow-400" />
             <h3 className="text-2xl font-semibold mb-2">Office Address</h3>
             <p className="text-gray-200">
@@ -367,30 +369,17 @@ const LandingPage = () => {
           <div className="flex flex-col justify-center items-center mt-8">
             <h3 className="text-xl font-semibold mb-4">Follow Us</h3>
             <div className="flex gap-4 mb-4">
-              <a
-                href="#"
-                className="text-yellow-400 hover:text-white text-2xl transition"
-              >
-                <FaTwitterSquare />
-              </a>
-              <a
-                href="#"
-                className="text-yellow-400 hover:text-white text-2xl transition"
-              >
-                <FaLinkedin />
-              </a>
-              <a
-                href="#"
-                className="text-yellow-400 hover:text-white text-2xl transition"
-              >
-                <FaInstagram />
-              </a>
-              <a
-                href="#"
-                className="text-yellow-400 hover:text-white text-2xl transition"
-              >
-                <FaFacebookSquare />
-              </a>
+              {[FaTwitterSquare, FaLinkedin, FaInstagram, FaFacebookSquare].map(
+                (Icon, idx) => (
+                  <a
+                    key={idx}
+                    href="#"
+                    className="text-yellow-400 footer-icon text-2xl transition"
+                  >
+                    <Icon />
+                  </a>
+                )
+              )}
             </div>
           </div>
           <div className="mt-12 border-t border-white/10 pt-8 text-center text-sm sm:text-base">
@@ -409,7 +398,7 @@ const LandingPage = () => {
         </button>
       )}
 
-      {/* Animations */}
+      {/* Animations and Glow Effects */}
       <style>{`
         html { scroll-behavior: smooth; }
         .animate-fadeIn { animation: fadeIn 1s ease forwards; opacity: 0; }
@@ -423,6 +412,20 @@ const LandingPage = () => {
         .animate-float { animation: float 4s ease-in-out infinite; }
         .animate-float-reverse { animation: float 4s ease-in-out infinite reverse; }
         @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* Hover glow effect for cards */
+        .hover-glow:hover {
+          box-shadow: 0 0 20px 4px #FFD700, 0 0 40px 8px #FF8C00;
+          transform: translateY(-3px);
+          transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        /* Hover glow effect for footer icons */
+        .footer-icon:hover {
+          filter: drop-shadow(0 0 6px #FFD700) drop-shadow(0 0 12px #FF8C00);
+          transform: scale(1.2);
+          transition: transform 0.3s, filter 0.3s;
+        }
       `}</style>
     </div>
   );
