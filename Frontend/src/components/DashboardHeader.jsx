@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
+import logo from "../assets/LogoPowerpay.png"
 
 const DashboardHeader = () => {
   const { user, logout } = useContext(AuthContext);
@@ -16,6 +17,11 @@ const DashboardHeader = () => {
 
   return (
     <div className="relative z-10 mb-6">
+       {/* <img
+      src={logo}  // ✅ or external URL
+      alt="PowerPe Logo"
+      className="w-[auto] h-10 mx-[auto] mb-4 "
+    /> */}
       <div className="flex items-center justify-between mb-2">
         {/* Profile info */}
         <div className="flex items-center gap-3">

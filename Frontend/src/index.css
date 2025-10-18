@@ -93,6 +93,10 @@ input:focus, select:focus, textarea:focus {
   scrollbar-arrow-color: darkgray;
 }
 
+.scrollbarnone{
+  scrollbar-width:none;
+}
+
 /* Alerts stay inside container without shifting size */
 .alert {
   min-height: 48px;
