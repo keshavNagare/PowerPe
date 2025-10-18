@@ -13,6 +13,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { BaseUrl } from "../../Urls";
 
 // Reusable GlassCard Component
 const GlassCard = ({ children, className = "" }) => (
@@ -82,7 +83,7 @@ const CustomerDashboard = () => {
     const fetchBills = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/customer/bills",
+          `${BaseUrl}/api/customer/bills`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setBills(res.data);
@@ -104,7 +105,7 @@ const CustomerDashboard = () => {
     const fetchPayments = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/customer/payments",
+          `${BaseUrl}/api/customer/payments`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setPayments(res.data);
@@ -116,7 +117,7 @@ const CustomerDashboard = () => {
     const fetchConsumption = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/customer/consumption",
+          `${BaseUrl}/api/customer/consumption`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setAllConsumptionData(res.data);
@@ -162,7 +163,7 @@ const CustomerDashboard = () => {
   const handlePayBill = async (bill) => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/customer/razorpay/order",
+        `${BaseUrl}/api/customer/razorpay/order`,
         { amount: bill.amount, billId: bill._id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -180,7 +181,7 @@ const CustomerDashboard = () => {
         handler: async function (response) {
           setIsRazorpayOpen(false);
           const verifyRes = await axios.post(
-            "http://localhost:8000/api/customer/razorpay/verify",
+            `${BaseUrl}/api/customer/razorpay/verify`,
             { ...response, billId: bill._id },
             { headers: { Authorization: `Bearer ${token}` } }
           );

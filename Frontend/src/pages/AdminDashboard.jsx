@@ -3,6 +3,7 @@ import axios from "axios";
 import DashboardHeader from "../components/DashboardHeader";
 import { AuthContext } from "../context/AuthContext";
 import { XMarkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { BaseUrl } from "../../Urls";
 
 // Reusable GlassCard
 const GlassCard = ({ children, className = "" }) => (
@@ -139,7 +140,7 @@ const AdminDashboard = () => {
   const fetchCustomers = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:8000/api/admin/customers",
+        `${BaseUrl}/api/admin/customers`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCustomers(res.data);
@@ -151,7 +152,7 @@ const AdminDashboard = () => {
   // Fetch bills
   const fetchBills = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/admin/bills", {
+      const res = await axios.get(`${BaseUrl}/api/admin/bills`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBills(res.data);
@@ -203,7 +204,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.post(
-        "http://localhost:8000/api/admin/bills",
+        `${BaseUrl}/api/admin/bills`,
         {
           user: selectedCustomer._id,
           units,
@@ -233,7 +234,7 @@ const AdminDashboard = () => {
 
   const handleDeleteBill = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/admin/bills/${id}`, {
+      await axios.delete(`${BaseUrl}/api/admin/bills/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchBills();
@@ -261,7 +262,7 @@ const AdminDashboard = () => {
 
     try {
       await axios.put(
-        `http://localhost:8000/api/admin/bills/${editBill._id}`,
+        `${BaseUrl}/api/admin/bills/${editBill._id}`,
         {
           units: editUnits,
           amount: editAmount,

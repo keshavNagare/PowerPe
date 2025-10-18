@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { EyeIcon, EyeSlashIcon, XMarkIcon } from "@heroicons/react/24/solid"; 
 import logo from "../assets/LogoPowerpay.png";
+import { BaseUrl } from "../../Urls";
 
 const GlassCard = ({ children, className }) => (
   <div
@@ -84,7 +85,7 @@ const RegisterPage = () => {
     }
 
     try {
-      await axios.post("http://localhost:8000/api/auth/register", {
+      await axios.post(`${BaseUrl}/api/auth/register`, {
         name,
         email,
         password,

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import logo from "../assets/LogoPowerpay.png";
 import { XMarkIcon } from "@heroicons/react/24/solid"; // for close button
+import { BaseUrl } from "../../Urls";
 
 const GlassCard = ({ children, className }) => (
   <div
@@ -85,7 +86,7 @@ const LoginPage = () => {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/login", {
+      const res = await axios.post(`${BaseUrl}/api/auth/login`, {
         email,
         password,
       });
