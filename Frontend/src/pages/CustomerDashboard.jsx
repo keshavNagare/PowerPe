@@ -13,6 +13,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
+import CountUp from "react-countup";
 import { BaseUrl } from "../../Urls";
 
 // Reusable GlassCard Component
@@ -82,10 +83,9 @@ const CustomerDashboard = () => {
 
     const fetchBills = async () => {
       try {
-        const res = await axios.get(
-          `${BaseUrl}/api/customer/bills`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get(`${BaseUrl}/api/customer/bills`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setBills(res.data);
 
         const due = res.data
@@ -104,10 +104,9 @@ const CustomerDashboard = () => {
 
     const fetchPayments = async () => {
       try {
-        const res = await axios.get(
-          `${BaseUrl}/api/customer/payments`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get(`${BaseUrl}/api/customer/payments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setPayments(res.data);
       } catch (error) {
         console.error("Error fetching payments", error);
@@ -116,10 +115,9 @@ const CustomerDashboard = () => {
 
     const fetchConsumption = async () => {
       try {
-        const res = await axios.get(
-          `${BaseUrl}/api/customer/consumption`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get(`${BaseUrl}/api/customer/consumption`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setAllConsumptionData(res.data);
 
         const years = Array.from(
@@ -318,7 +316,14 @@ const CustomerDashboard = () => {
               <h3 className="text-lg font-semibold">Total Amount Due</h3>
               <hr className="border-white/20 mb-3" />
               <h2 className="text-3xl font-bold text-green-400 mt-2">
-                ₹{totalDue.toFixed(2)}
+                <CountUp
+                  start={0}
+                  end={totalDue}
+                  duration={2} // animation duration in seconds
+                  separator=","
+                  decimals={2}
+                  prefix="₹"
+                />
               </h2>
             </GlassCard>
           </div>
@@ -364,7 +369,9 @@ const CustomerDashboard = () => {
 
             {/* Consumption History */}
             <GlassCard className="p-6">
-              <h3 className="text-lg font-semibold">Consumption History (kWh)</h3>
+              <h3 className="text-lg font-semibold">
+                Consumption History (kWh)
+              </h3>
               <hr className="border-white/20 mb-3" />
 
               {/* Filters */}
@@ -504,7 +511,9 @@ const CustomerDashboard = () => {
                               <td className="p-3 text-gray-200">
                                 {bill.dueDate?.slice(0, 10)}
                               </td>
-                              <td className="p-3 text-gray-200">{bill.units}</td>
+                              <td className="p-3 text-gray-200">
+                                {bill.units}
+                              </td>
                               <td className="p-3 text-gray-200">
                                 ₹{bill.amount}
                               </td>
@@ -608,8 +617,12 @@ const CustomerDashboard = () => {
                           )
                           .map((p, i) => (
                             <tr key={i}>
-                              <td className="p-3 text-gray-200">{p.userEmail}</td>
-                              <td className="p-3 text-gray-200">{p.paymentId}</td>
+                              <td className="p-3 text-gray-200">
+                                {p.userEmail}
+                              </td>
+                              <td className="p-3 text-gray-200">
+                                {p.paymentId}
+                              </td>
                               <td className="p-3 text-gray-200">{p.billId}</td>
                               <td className="p-3 text-gray-200">
                                 {typeof p.amount === "number"

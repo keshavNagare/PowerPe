@@ -4,6 +4,7 @@ import DashboardHeader from "../components/DashboardHeader";
 import { AuthContext } from "../context/AuthContext";
 import { XMarkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { BaseUrl } from "../../Urls";
+import CountUp from "react-countup";
 
 // Reusable GlassCard
 const GlassCard = ({ children, className = "" }) => (
@@ -46,8 +47,7 @@ const CustomerDropdown = ({
       if (ref.current && !ref.current.contains(event.target)) setOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const filteredCustomers = customers.filter(
@@ -120,6 +120,7 @@ const CustomerDropdown = ({
 const AdminDashboard = () => {
   const { token, user } = useContext(AuthContext);
   const [customers, setCustomers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0); // <-- New state for total users
   const [bills, setBills] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [unitsConsumed, setUnitsConsumed] = useState("");
@@ -131,6 +132,12 @@ const AdminDashboard = () => {
   const [editAmount, setEditAmount] = useState("");
   const [editDueDate, setEditDueDate] = useState("");
   const [editStatus, setEditStatus] = useState("");
+
+  // Payment History states
+  const [payments, setPayments] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(0);
+  const [selectedMonth, setSelectedMonth] = useState(0);
+  const [availableYears, setAvailableYears] = useState([]);
 
   // New states for year/month filter
   const [filterYear, setFilterYear] = useState("");
@@ -146,11 +153,11 @@ const AdminDashboard = () => {
   // Fetch customers
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get(
-        `${BaseUrl}/api/admin/customers`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.get(`${BaseUrl}/api/admin/customers`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setCustomers(res.data);
+      setTotalUsers(res.data.length); // <-- Set total users count
     } catch (error) {
       console.error("Error fetching customers:", error);
     }
@@ -167,6 +174,26 @@ const AdminDashboard = () => {
       console.error("Error fetching bills:", error);
     }
   };
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const res = await axios.get(`${BaseUrl}/api/customer/payments`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setPayments(res.data);
+
+        // Generate available years dynamically
+        const yearsSet = new Set(
+          res.data.map((p) => new Date(p.createdAt).getFullYear())
+        );
+        setAvailableYears([...yearsSet].sort((a, b) => b - a));
+      } catch (error) {
+        console.error("Error fetching payments", error);
+      }
+    };
+    fetchPayments();
+  }, [token]);
 
   useEffect(() => {
     fetchCustomers();
@@ -303,8 +330,12 @@ const AdminDashboard = () => {
     .filter((bill) => {
       if (!filterYear && !filterMonth) return true;
       const issue = new Date(bill.issueDate);
-      const yearMatch = filterYear ? issue.getFullYear() === parseInt(filterYear) : true;
-      const monthMatch = filterMonth ? issue.getMonth() + 1 === parseInt(filterMonth) : true;
+      const yearMatch = filterYear
+        ? issue.getFullYear() === parseInt(filterYear)
+        : true;
+      const monthMatch = filterMonth
+        ? issue.getMonth() + 1 === parseInt(filterMonth)
+        : true;
       return yearMatch && monthMatch;
     })
     .sort(
@@ -332,6 +363,14 @@ const AdminDashboard = () => {
     { value: 11, name: "November" },
     { value: 12, name: "December" },
   ];
+
+  const filteredPayments = payments.filter((p) => {
+    const date = new Date(p.createdAt);
+    const yearMatch = selectedYear === 0 || date.getFullYear() === selectedYear;
+    const monthMatch =
+      selectedMonth === 0 || date.getMonth() + 1 === selectedMonth;
+    return yearMatch && monthMatch;
+  });
 
   return (
     <div className="min-h-screen flex flex-col relative lg:flex-row bg-gradient-to-tr from-[#232526] to-[#414345] text-white p-4 sm:p-6 overflow-hidden">
@@ -379,6 +418,15 @@ const AdminDashboard = () => {
                 </p>
               </div>
             </GlassCard>
+            {/* Total Users Card with dynamic counter */}
+            <GlassCard className="p-6 mt-4">
+              <h2 className="text-xl font-semibold mb-2 border-b border-white/20 pb-2">
+                Total Registered Users
+              </h2>
+              <div className="text-3xl font-bold text-blue-400 mt-4">
+                <CountUp end={totalUsers} duration={1.5} separator="," />
+              </div>
+            </GlassCard>
           </div>
 
           {/* Generate Bill + Table */}
@@ -409,109 +457,131 @@ const AdminDashboard = () => {
 
             {/* All Bills Table with fixed header */}
             <GlassCard className="p-6">
-  <h2 className="text-xl font-semibold mb-2">All Bills</h2>
-  <hr className="border-white/20 mb-4" />
+              <h2 className="text-xl font-semibold mb-2">All Bills</h2>
+              <hr className="border-white/20 mb-4" />
 
-  {/* Search + Filters */}
-  <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-    <input
-      type="text"
-      placeholder="Search by name, email or status..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="w-full sm:w-1/2 bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-    />
-    <select
-      value={filterYear}
-      onChange={(e) => setFilterYear(e.target.value)}
-      className="w-full sm:w-1/4 bg-[#4a4c4d] shadow-[1px_2px_4px_rgb(32,32,32)] border border-white/20 rounded-lg px-4 py-2 text-gray-200"
-    >
-      <option value="">All Years</option>
-      {years.map((y) => (
-        <option key={y} value={y}>
-          {y}
-        </option>
-      ))}
-    </select>
-    <select
-      value={filterMonth}
-      onChange={(e) => setFilterMonth(e.target.value)}
-      className="w-full sm:w-1/4 bg-[#4a4c4d] shadow-[1px_2px_4px_rgb(32,32,32)] border border-white/20 rounded-lg px-4 py-2 text-gray-200"
-    >
-      <option value="">All Months</option>
-      {months.map((m) => (
-        <option key={m.value} value={m.value}>
-          {m.name}
-        </option>
-      ))}
-    </select>
-  </div>
+              {/* Search + Filters */}
+              <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                <input
+                  type="text"
+                  placeholder="Search by name, email or status..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full sm:w-1/2 bg-white/10 border border-white/20 rounded-lg px-4 py-2 text-sm text-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="w-full sm:w-1/4 bg-[#4a4c4d] shadow-[1px_2px_4px_rgb(32,32,32)] border border-white/20 rounded-lg px-4 py-2 text-gray-200"
+                >
+                  <option value="">All Years</option>
+                  {years.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={filterMonth}
+                  onChange={(e) => setFilterMonth(e.target.value)}
+                  className="w-full sm:w-1/4 bg-[#4a4c4d] shadow-[1px_2px_4px_rgb(32,32,32)] border border-white/20 rounded-lg px-4 py-2 text-gray-200"
+                >
+                  <option value="">All Months</option>
+                  {months.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-  {/* Responsive table wrapper */}
-  <div className="overflow-x-auto w-full scrollwidth">
-    <div className="inline-block min-w-[800px] w-full scrollwidth" style={{ maxHeight: "50vh", overflowY: "auto" }}>
-      <table className="w-full text-sm text-left border-collapse">
-        {/* Table Head */}
-        <thead className="text-gray-300 uppercase text-xs border-b border-white/20 sticky top-0 bg-[#2d2f31] z-10">
-          <tr>
-            <th className="p-3 sm:p-4">Customer</th>
-            <th className="p-3 sm:p-4">Email</th>
-            <th className="p-3 sm:p-4">Units</th>
-            <th className="p-3 sm:p-4">Amount</th>
-            <th className="p-3 sm:p-4">Issue Date</th>
-            <th className="p-3 sm:p-4">Due Date</th>
-            <th className="p-3 sm:p-4">Status</th>
-            <th className="p-3 sm:p-4">Actions</th>
-          </tr>
-        </thead>
+              {/* Responsive table wrapper */}
+              <div className="overflow-x-auto w-full scrollwidth">
+                <div
+                  className="inline-block min-w-[800px] w-full scrollwidth"
+                  style={{ maxHeight: "50vh", overflowY: "auto" }}
+                >
+                  <table className="w-full text-sm text-left border-collapse">
+                    {/* Table Head */}
+                    <thead className="text-gray-300 uppercase text-xs border-b border-white/20 sticky top-0 bg-[#2d2f31] z-10">
+                      <tr>
+                        <th className="p-3 sm:p-4">Customer</th>
+                        <th className="p-3 sm:p-4">Email</th>
+                        <th className="p-3 sm:p-4">Units</th>
+                        <th className="p-3 sm:p-4">Amount</th>
+                        <th className="p-3 sm:p-4">Issue Date</th>
+                        <th className="p-3 sm:p-4">Due Date</th>
+                        <th className="p-3 sm:p-4">Status</th>
+                        <th className="p-3 sm:p-4">Actions</th>
+                      </tr>
+                    </thead>
 
-        {/* Table Body */}
-        <tbody className="divide-y divide-white/20">
-          {filteredBills.length > 0 ? (
-            filteredBills.map((bill) => (
-              <tr key={bill._id} className="hover:bg-white/10 transition-colors">
-                <td className="p-3 sm:p-4 text-white">{bill.user?.name}</td>
-                <td className="p-3 sm:p-4 text-gray-300">{bill.user?.email}</td>
-                <td className="p-3 sm:p-4 text-gray-200">{bill.units} kWh</td>
-                <td className="p-3 sm:p-4 text-gray-200">₹{bill.amount}</td>
-                <td className="p-3 sm:p-4 text-gray-400">{bill.issueDate?.slice(0, 10)}</td>
-                <td className="p-3 sm:p-4 text-gray-400">{bill.dueDate?.slice(0, 10)}</td>
-                <td className="p-3 sm:p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      bill.status === "paid"
-                        ? "bg-green-500/20 text-green-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
-                  >
-                    {bill.status}
-                  </span>
-                </td>
-                <td className="p-3 sm:p-4 flex gap-2">
-                  <PencilIcon
-                    onClick={() => openEditModal(bill)}
-                    className="w-5 h-5 text-yellow-400 cursor-pointer hover:text-yellow-300"
-                  />
-                  <TrashIcon
-                    onClick={() => handleDeleteBill(bill._id)}
-                    className="w-5 h-5 text-red-400 cursor-pointer hover:text-red-300"
-                  />
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="8" className="text-center text-gray-300 py-12">
-                No bills found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</GlassCard>
+                    {/* Table Body */}
+                    <tbody className="divide-y divide-white/20">
+                      {filteredBills.length > 0 ? (
+                        filteredBills.map((bill) => (
+                          <tr
+                            key={bill._id}
+                            className="hover:bg-white/10 transition-colors"
+                          >
+                            <td className="p-3 sm:p-4 text-white">
+                              {bill.user?.name}
+                            </td>
+                            <td className="p-3 sm:p-4 text-gray-300">
+                              {bill.user?.email}
+                            </td>
+                            <td className="p-3 sm:p-4 text-gray-200">
+                              {bill.units} kWh
+                            </td>
+                            <td className="p-3 sm:p-4 text-gray-200">
+                              ₹{bill.amount}
+                            </td>
+                            <td className="p-3 sm:p-4 text-gray-400">
+                              {bill.issueDate?.slice(0, 10)}
+                            </td>
+                            <td className="p-3 sm:p-4 text-gray-400">
+                              {bill.dueDate?.slice(0, 10)}
+                            </td>
+                            <td className="p-3 sm:p-4">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                  bill.status === "paid"
+                                    ? "bg-green-500/20 text-green-400"
+                                    : "bg-red-500/20 text-red-400"
+                                }`}
+                              >
+                                {bill.status}
+                              </span>
+                            </td>
+                            <td className="p-3 sm:p-4 flex gap-2">
+                              <PencilIcon
+                                onClick={() => openEditModal(bill)}
+                                className="w-5 h-5 text-yellow-400 cursor-pointer hover:text-yellow-300"
+                              />
+                              <TrashIcon
+                                onClick={() => handleDeleteBill(bill._id)}
+                                className="w-5 h-5 text-red-400 cursor-pointer hover:text-red-300"
+                              />
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan="8"
+                            className="text-center text-gray-300 py-12"
+                          >
+                            No bills found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </GlassCard>
 
+           
           </div>
         </div>
       </main>
