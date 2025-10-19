@@ -92,10 +92,14 @@ const LandingPage = () => {
         {/* Desktop Menu */}
         <ul className="hidden md:flex items-center gap-6 text-gray-200 font-medium">
           {["how", "features", "contact"].map((item) => (
-            <li key={item}>
+            <li key={item} className="relative">
               <a
                 href={`#${item}`}
-                className="!no-underline hover:text-yellow-400 transition relative after:absolute after:bottom-0 after:left-1/2 after:w-0 after:h-[1.5px] after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full"
+                className="!no-underline hover:!text-white !transition !relative
+          after:!content-[''] after:!absolute after:!bottom-0 after:!left-1/2 
+          after:!h-[1.4px] after:!w-0 after:!bg-white 
+          after:!transition-all after:!duration-250 after:!transform after:!-translate-x-1/2
+          hover:after:!w-full"
               >
                 {item === "how"
                   ? "How It Works"
@@ -109,13 +113,13 @@ const LandingPage = () => {
         <div className="hidden md:flex gap-4">
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg font-semibold hover:bg-yellow-300 transition"
+            className="px-4 py-2 bg-yellow-400 !text-white rounded-lg font-semibold hover:bg-yellow-300 transition"
           >
             Login
           </button>
           <button
             onClick={() => navigate("/register")}
-            className="px-4 py-2 bg-transparent border border-yellow-400 text-yellow-400 rounded-lg font-semibold hover:bg-yellow-400 hover:text-gray-900 transition"
+            className="px-4 py-2 bg-transparent border border-yellow-400 !text-white rounded-lg font-semibold hover:bg-yellow-400 hover:text-gray-900 transition"
           >
             Sign Up
           </button>
@@ -199,7 +203,7 @@ const LandingPage = () => {
               setNavOpen(false);
               navigate("/login");
             }}
-            className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-yellow-300 transition-transform hover:scale-105 animate-fadeIn delay-400"
+            className="bg-yellow-400 !text-white px-8 py-3 rounded-lg font-semibold flex items-center gap-2 hover:bg-yellow-300 transition-transform hover:scale-105 animate-fadeIn delay-400"
           >
             Get Started <ArrowRightIcon className="w-5 h-5" />
           </button>
@@ -339,9 +343,7 @@ const LandingPage = () => {
           <GlassCard className="p-8 hover-glow transition-transform duration-300">
             <MapPinIcon className="w-10 h-10 mx-auto mb-4 text-yellow-400" />
             <h3 className="text-2xl font-semibold mb-2">Office Address</h3>
-            <p className="text-gray-200">
-              123 PowerPe Lane, Mumbai, India
-            </p>
+            <p className="text-gray-200">123 PowerPe Lane, Mumbai, India</p>
           </GlassCard>
         </div>
       </section>
