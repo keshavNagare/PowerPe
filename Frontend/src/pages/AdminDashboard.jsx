@@ -335,7 +335,7 @@ const AdminDashboard = () => {
             messageType === "error"
               ? "bg-red-500/20 text-red-400 border-red-400/30"
               : "bg-green-500/20 text-green-400 border-green-400/30"
-          } top-[9%] left-1/2 sm:top-[8%] md:top-6 transform-translate-x-1/2`}
+          } top-[9%] transform-translate-x-1/2 left-1/2 sm:top-[8%] md:top-6 `}
         >
           <span className="text-sm font-medium">{message}</span>
           <button
