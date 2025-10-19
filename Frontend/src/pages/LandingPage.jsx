@@ -161,7 +161,7 @@ const LandingPage = () => {
                 setNavOpen(false);
                 navigate("/login");
               }}
-              className="px-6 py-3 bg-yellow-400 text-gray-900 rounded-lg font-semibold hover:bg-yellow-300 transition"
+              className="px-6 py-3 bg-yellow-400 !text-white rounded-lg font-semibold hover:bg-yellow-300 transition"
             >
               Login
             </button>
@@ -170,7 +170,7 @@ const LandingPage = () => {
                 setNavOpen(false);
                 navigate("/register");
               }}
-              className="px-6 py-3 bg-transparent border border-yellow-400 text-yellow-400 rounded-lg font-semibold hover:bg-yellow-400 hover:text-gray-900 transition"
+              className="px-6 py-3 bg-transparent border border-yellow-400 !text-white rounded-lg font-semibold hover:bg-yellow-400 hover:!text-white transition"
             >
               Sign Up
             </button>
