@@ -179,7 +179,12 @@ const LandingPage = () => {
       )}
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-24 pt-24 bg-gradient-to-tr from-[#232526] via-[#414345] to-[#ffb347] overflow-hidden">
+      <section
+        className="relative min-h-screen flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-24 pt-24 
+  !bg-none !important
+  [background-image:linear-gradient(to_top_right,#232526,#414345,#ffb347)!important]
+  overflow-hidden"
+      >
         <img
           src={heroImgLeft}
           alt="Hero Left"
