@@ -174,7 +174,7 @@ const CustomerDashboard = () => {
         currency: "INR",
         name: "PowerPe",
         description: "Electricity Bill Payment",
-        image: "http://localhost:5173/LogoP.png",
+        image: "/LogoP.png",
         order_id: orderId,
         handler: async function (response) {
           setIsRazorpayOpen(false);
