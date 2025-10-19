@@ -40,7 +40,7 @@ const FormInput = ({
       {showToggle && (
         <button
           type="button"
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-yellow-400 !bg-none !bg-transparent !shadow-none"
+          className="absolute right-3 top-[calc(1/4*100%)] transform -translate-y-1/2 text-gray-400 hover:text-yellow-400 !bg-none !bg-transparent !shadow-none"
           onClick={() => setShowPassword(!showPassword)}
         >
           {showPassword ? (
