@@ -256,8 +256,17 @@ const CustomerDashboard = () => {
     setCalculatorInfo(details);
   };
 
+  // Filtered bills and payments for table display
   const filteredBills = bills.filter((bill) => {
     const date = new Date(bill.issueDate);
+    const yearMatch = date.getFullYear() === selectedYear;
+    const monthMatch =
+      selectedMonth === 0 || date.getMonth() + 1 === selectedMonth;
+    return yearMatch && monthMatch;
+  });
+
+  const filteredPayments = payments.filter((p) => {
+    const date = new Date(p.createdAt);
     const yearMatch = date.getFullYear() === selectedYear;
     const monthMatch =
       selectedMonth === 0 || date.getMonth() + 1 === selectedMonth;
@@ -432,10 +441,38 @@ const CustomerDashboard = () => {
               )}
             </GlassCard>
 
-            {/* Bill History */}
+            {/* Bill History with filters */}
             <GlassCard className="p-6">
               <h3 className="text-lg font-semibold">Bill History</h3>
               <hr className="border-white/20 mb-3" />
+
+              {/* Filters */}
+              <div className="flex justify-end gap-2 mb-3">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="bg-[#4a4c4d] text-white px-2 py-1 rounded !w-[150px]"
+                >
+                  {availableYears.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                  className="bg-[#4a4c4d] text-white px-2 py-1 rounded !w-[150px]"
+                >
+                  <option value={0}>All Months</option>
+                  {monthNames.map((m, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="overflow-x-auto scrollwidth">
                 <div
                   className="inline-block min-w-[700px] w-full scrollwidth"
@@ -510,16 +547,44 @@ const CustomerDashboard = () => {
               </div>
             </GlassCard>
 
-            {/* Payment History */}
+            {/* Payment History with filters */}
             <GlassCard className="p-6">
               <h3 className="text-lg font-semibold">Payment History</h3>
               <hr className="border-white/20 mb-3" />
+
+              {/* Filters */}
+              <div className="flex justify-end gap-2 mb-3">
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="bg-[#4a4c4d] text-white px-2 py-1 rounded !w-[150px]"
+                >
+                  {availableYears.map((y) => (
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={selectedMonth}
+                  onChange={(e) => setSelectedMonth(Number(e.target.value))}
+                  className="bg-[#4a4c4d] text-white px-2 py-1 rounded !w-[150px]"
+                >
+                  <option value={0}>All Months</option>
+                  {monthNames.map((m, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="overflow-x-auto scrollbarnone">
                 <div
                   className="inline-block min-w-[700px] w-full scrollwidth"
                   style={{
-                    maxHeight: payments.length > 4 ? "300px" : "auto",
-                    overflowY: payments.length > 4 ? "auto" : "visible",
+                    maxHeight: filteredPayments.length > 4 ? "300px" : "auto",
+                    overflowY: filteredPayments.length > 4 ? "auto" : "visible",
                   }}
                 >
                   <table className="w-full text-sm text-left border-collapse">
@@ -535,23 +600,8 @@ const CustomerDashboard = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/20">
-                      {payments.filter((p) => {
-                        const date = new Date(p.createdAt);
-                        const yearMatch = date.getFullYear() === selectedYear;
-                        const monthMatch =
-                          selectedMonth === 0 ||
-                          date.getMonth() + 1 === selectedMonth;
-                        return yearMatch && monthMatch;
-                      }).length > 0 ? (
-                        [...payments]
-                          .filter((p) => {
-                            const date = new Date(p.createdAt);
-                            const yearMatch = date.getFullYear() === selectedYear;
-                            const monthMatch =
-                              selectedMonth === 0 ||
-                              date.getMonth() + 1 === selectedMonth;
-                            return yearMatch && monthMatch;
-                          })
+                      {filteredPayments.length > 0 ? (
+                        [...filteredPayments]
                           .sort(
                             (a, b) =>
                               new Date(b.createdAt) - new Date(a.createdAt)
