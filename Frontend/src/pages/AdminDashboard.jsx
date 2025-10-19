@@ -136,6 +136,13 @@ const AdminDashboard = () => {
   const [filterYear, setFilterYear] = useState("");
   const [filterMonth, setFilterMonth] = useState("");
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   // Fetch customers
   const fetchCustomers = async () => {
     try {
