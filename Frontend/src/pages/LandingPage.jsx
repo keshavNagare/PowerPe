@@ -96,10 +96,12 @@ const LandingPage = () => {
               <a
                 href={`#${item}`}
                 className="!no-underline hover:!text-white !transition !relative
-          after:!content-[''] after:!absolute after:!bottom-0 after:!left-1/2 
-          after:!h-[1.4px] after:!w-0 after:!bg-white 
-          after:!transition-all after:!duration-250 after:!transform after:!-translate-x-1/2
-          hover:after:!w-full"
+        after:!content-[''] after:!absolute after:!bottom-0 
+        after:![left:calc(1/11*0%)] 
+        after:![--tw-translate-x:-50%] after:![--tw-translate-y:-50%]
+        after:!h-[1.4px] after:!w-0 after:!bg-white 
+        after:!transition-all after:!duration-300 after:!transform 
+        hover:after:!w-full"
               >
                 {item === "how"
                   ? "How It Works"
