@@ -142,7 +142,7 @@ const LandingPage = () => {
 
       {/* Mobile Menu */}
       {navOpen && (
-        <div className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40 flex flex-col items-center justify-center space-y-8">
+        <div className="md:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-49 flex flex-col items-center justify-center space-y-8">
           {["how", "features", "contact"].map((item) => (
             <a
               key={item}
@@ -401,7 +401,7 @@ const LandingPage = () => {
       {showTopBtn && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 p-3 bg-yellow-400 text-gray-900 rounded-full shadow-lg hover:bg-yellow-300 transition z-50"
+          className="fixed bottom-6 right-6 p-3 bg-yellow-400 text-white rounded-full shadow-lg hover:bg-yellow-300 transition z-48"
         >
           <ChevronUpIcon className="w-6 h-6" />
         </button>
