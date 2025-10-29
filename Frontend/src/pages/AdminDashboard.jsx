@@ -393,6 +393,9 @@ const AdminDashboard = () => {
         </div>
       )}
 
+      <div className="absolute w-96 h-96 bg-yellow-500 rounded-full filter blur-3xl opacity-30 top-[-100px] left-[-100px]"></div>
+      <div className="absolute w-72 h-72 bg-yellow-500 rounded-full filter blur-3xl opacity-30 bottom-[-50px] right-[-50px]"></div>
+
       <main className="flex-1 relative z-10 space-y-8 px-4 sm:px-6 lg:px-16 xl:px-24">
         <DashboardHeader />
 
@@ -580,8 +583,6 @@ const AdminDashboard = () => {
                 </div>
               </div>
             </GlassCard>
-
-           
           </div>
         </div>
       </main>
